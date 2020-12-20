@@ -1,0 +1,102 @@
+Sub WallStreet():
+ 
+    ' Loop Through All of the Years
+     
+Dim WS As Worksheet
+    For Each WS In ActiveWorkbook.Worksheets
+    WS.Activate
+    
+        ' Last Row
+        LastRow = WS.Cells(Rows.Count, 1).End(xlUp).Row
+
+        'Denote Variable
+        
+        Dim Yearly_Change As Double
+        Dim Ticker_Name As String
+        Dim Year_Open As Double
+        Dim Year_Close As Double
+        Dim Percent_Change As Double
+        Dim StockVolume As Double
+        Dim Row As Double
+        Dim Column As Integer
+        Dim i As Long
+        
+         StockVolume = 0
+         Column = 1
+         Row = 2
+         StockVolume = 0
+         
+          'Initial Open Price
+        Year_Open = Cells(2, Column + 2).Value
+         
+         ' Add Heading for summary
+        Cells(1, 9).Value = "Ticker"
+        Cells(1, 10).Value = "Yearly Change"
+        Cells(1, 11).Value = "Percent Change"
+        Cells(1, 12).Value = "Total Stock Volume"
+        
+       'Fill Summary
+        For i = 2 To LastRow
+       
+            If Cells(i + 1, Column).Value <> Cells(i, Column).Value Then
+                '
+                Ticker_Name = Cells(i, Column).Value
+                
+                Cells(Row, Column + 8).Value = Ticker_Name
+            
+                Year_Close = Cells(i, Column + 5).Value
+              
+                Yearly_Change = Year_Close - Year_Open
+                
+                Cells(Row, Column + 9).Value = Yearly_Change
+                
+                If (Year_Open = 0 And Year_Close = 0) Then
+                    Percent_Change = 0
+                    
+                ElseIf (Year_Open = 0 And Year_Close <> 0) Then
+                    Percent_Change = 1
+                    
+                Else
+                    Percent_Change = Yearly_Change / Year_Open
+                    Cells(Row, Column + 10).Value = Percent_Change
+                    Cells(Row, Column + 10).NumberFormat = "0.00%"
+                    
+                End If
+               
+                StockVolume = StockVolume + Cells(i, Column + 6).Value
+                
+                Cells(Row, Column + 11).Value = StockVolume
+                
+                StockVolume = 0
+                
+                Row = Row + 1
+               
+                Year_Open = Cells(i + 1, Column + 2)
+                
+           
+            Else
+                StockVolume = StockVolume + Cells(i, Column + 6).Value
+                
+            End If
+        Next i
+        
+        '  Last Row of Yearly Change
+        YCLastRow = WS.Cells(Rows.Count, Column + 8).End(xlUp).Row
+        
+        ' Cell Colors
+        For j = 2 To YCLastRow
+            If (Cells(j, Column + 9).Value > 0 Or Cells(j, Column + 9).Value = 0) Then
+                Cells(j, Column + 9).Interior.ColorIndex = 10
+                
+            ElseIf Cells(j, Column + 9).Value < 0 Then
+                Cells(j, Column + 9).Interior.ColorIndex = 3
+                
+            End If
+            
+        Next j
+        
+    Next WS
+
+        
+ End Sub
+
